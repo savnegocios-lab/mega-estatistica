@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#092b1b"><title>Mega Estatística</title>
+<style>
+:root{--bg:#071b13;--panel:#102b20;--panel2:#173929;--gold:#f3c94f;--green:#28b36a;--muted:#a9c2b2;--line:#2a4b39}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#06150f,#0c2a1d 60%,#071b13);color:#f6fff8;font:15px system-ui,Arial,sans-serif}
+header{padding:28px 18px 18px;max-width:1100px;margin:auto}h1{margin:0;color:var(--gold);font-size:clamp(28px,5vw,42px)}header p{margin:7px 0;color:var(--muted)}
+main{max-width:1100px;margin:auto;padding:0 18px 36px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 18px}.tab,button,select,input{font:inherit}.tab,button{border:1px solid var(--line);background:var(--panel2);color:white;padding:11px 15px;border-radius:12px;cursor:pointer}.tab.active,button.primary{background:var(--gold);color:#152416;border-color:var(--gold);font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:14px}.card{background:rgba(16,43,32,.94);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 30px #0002}.card h2,.card h3{margin:0 0 12px}.muted{color:var(--muted)}.balls{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.ball{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:#17301f;font-weight:900;box-shadow:inset 0 -3px 0 #bd9228}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#0a2117;border-radius:12px;padding:12px}.stat b{display:block;font-size:22px;color:var(--gold)}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.games{display:grid;gap:10px}.game{background:#0a2117;border:1px solid var(--line);padding:12px;border-radius:13px}.gamehead{display:flex;justify-content:space-between;align-items:center;gap:8px}.small{font-size:12px}.barrow{display:grid;grid-template-columns:30px 1fr 28px;gap:8px;align-items:center;margin:7px 0}.bar{height:9px;border-radius:20px;background:#244a35;overflow:hidden}.bar i{display:block;height:100%;background:var(--green)}.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}.controls input,.controls select{background:#071b13;border:1px solid var(--line);border-radius:10px;padding:10px;color:white}.notice{font-size:12px;color:var(--muted);line-height:1.5;margin-top:14px}.status{font-size:13px;color:var(--muted);margin:10px 0}.pill{font-size:11px;border:1px solid var(--line);border-radius:30px;padding:4px 8px;color:var(--muted)}footer{max-width:1100px;margin:auto;padding:0 18px 30px;color:var(--muted);font-size:12px}
+@media(max-width:480px){.ball{width:39px;height:39px}.stats{grid-template-columns:repeat(3,1fr)}}
+</style></head>
+<body>
+<header><h1>🍀 Mega Estatística</h1><p>Gerador de combinações com análise dos 10 concursos mais recentes</p></header>
+<main>
+<div class="tabs"><button class="tab active" data-mode="megasena">Mega-Sena</button><button class="tab" data-mode="virada">Mega da Virada</button></div>
+<div class="grid">
+<section class="card"><h2>Último resultado</h2><div id="latest" class="muted">Carregando resultados…</div><div id="status" class="status">Tentando consultar a fonte de resultados.</div><button id="refresh">↻ Atualizar agora</button></section>
+<section class="card"><h2>Resumo estatístico</h2><div class="stats"><div class="stat"><b id="drawCount">—</b><span class="small muted">concursos</span></div><div class="stat"><b id="hotCount">—</b><span class="small muted">dezenas quentes</span></div><div class="stat"><b id="oddEven">—</b><span class="small muted">par/ímpar médio</span></div></div><p class="notice" id="period">Aguardando dados.</p></section>
+</div>
+<div class="grid" style="margin-top:14px">
+<section class="card"><h2>Gerar jogos</h2><p class="muted">Combinações ponderadas por frequência recente, equilíbrio par/ímpar e distribuição pelas faixas numéricas.</p><div class="controls"><label for="qty">Quantidade</label><select id="qty"><option>5</option><option selected>10</option><option>20</option><option>30</option><option>50</option></select></div><button class="primary" id="generate">✨ Gerar combinações</button><div class="notice">Cada jogo contém 6 dezenas distintas entre 01 e 60.</div></section>
+<section class="card"><h2>Dezenas mais frequentes</h2><div id="frequency" class="muted">Aguardando dados.</div></section>
+</div>
+<section class="card" style="margin-top:14px"><div class="gamehead"><h2 style="margin:0">Suas combinações</h2><button id="copy">Copiar jogos</button></div><div id="games" class="games" style="margin-top:14px"><p class="muted">Gere seus primeiros jogos.</p></div></section>
+<section class="card" style="margin-top:14px"><h3>Como a análise funciona</h3><p class="muted">O gerador considera a frequência de cada dezena nos 10 concursos carregados, atribui peso moderado às mais recorrentes e favorece combinações equilibradas. A aba Mega da Virada usa os resultados históricos da própria edição especial quando disponíveis; se não houver dez concursos especiais acessíveis, informa a limitação e usa a amostra recente da Mega-Sena como referência.</p><p class="notice">Importante: sorteios são aleatórios e independentes. Frequências passadas não aumentam a probabilidade matemática de uma dezena sair. Uma aposta simples continua tendo chance de 1 em 50.063.860. Use o recurso como entretenimento e aposte com responsabilidade.</p></section>
+</main><footer>Os resultados dependem da disponibilidade da fonte pública de dados e da conexão com a internet. A atualização ocorre ao abrir o app e ao tocar em “Atualizar agora”.</footer>
+<script>
+const API='https://loteriascaixa-api.herokuapp.com/api';
+let mode='megasena', draws=[], generated=[];
+const $=id=>document.getElementById(id);
+const fmt=n=>String(n).padStart(2,'0');
+function norm(d){return {concurso:Number(d.concurso||d.numero),data:d.data||d.dataApuracao||'',dezenas:(d.dezenas||d.listaDezenas||[]).map(Number).sort((a,b)=>a-b)}}
+async function fetchJSON(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}
+async function load(){
+ $('status').textContent='Consultando resultados…';
+ try{
+  let latest=await fetchJSON(API+'/megasena/latest');
+  let last=norm(latest); if(!last.dezenas.length)throw Error('Formato de resultado inesperado');
+  let all=[]; for(let n=last.concurso;n>Math.max(0,last.concurso-10);n--){try{let d=n===last.concurso?latest:await fetchJSON(API+'/megasena/'+n);let x=norm(d);if(x.dezenas.length===6)all.push(x)}catch(e){}}
+  all.sort((a,b)=>b.concurso-a.concurso);
+  if(all.length<1)throw Error('Não foi possível obter os concursos recentes');
+  draws=all;
+  if(mode==='virada'){
+   let history=await fetchJSON(API+'/megasena');
+   let list=Array.isArray(history)?history:(history.resultados||[]);
+   let filtered=list.map(norm).filter(x=>x.dezenas.length===6 && /31\\/12/.test(x.data)).sort((a,b)=>b.concurso-a.concurso).slice(0,10);
+   if(filtered.length)draws=filtered;
+   else $('status').textContent='Histórico especial indisponível; exibindo os 10 concursos regulares mais recentes.';
+  }
+  $('status').textContent='Dados carregados. Última consulta: '+new Date().toLocaleString('pt-BR');
+  render();
+ }catch(e){
+  $('status').textContent='Não foi possível atualizar automaticamente ('+e.message+'). Verifique a conexão ou tente novamente mais tarde.';
+  $('latest').innerHTML='<p class="muted">Sem conexão com a fonte de resultados. O gerador pode ser usado quando os dados forem carregados.</p>';
+ }
+}
+function freq(){let f=Array(61).fill(0);draws.forEach(d=>d.dezenas.forEach(n=>f[n]++));return f}
+function render(){
+ if(!draws.length)return;
+ const f=freq(), latest=draws[0], sorted=Array.from({length:60},(_,i)=>i+1).sort((a,b)=>f[b]-f[a]||a-b);
+ $('latest').innerHTML='<div class="muted small">Concurso '+latest.concurso+(latest.data?' · '+latest.data:'')+'</div><div class="balls">'+latest.dezenas.map(n=>'<span class="ball">'+fmt(n)+'</span>').join('')+'</div>';
+ $('drawCount').textContent=draws.length;
+ $('hotCount').textContent=sorted.filter(n=>f[n]>=Math.max(2,Math.ceil(draws.length*.3))).length;
+ let odds=draws.reduce((s,d)=>s+d.dezenas.filter(n=>n%2).length,0)/draws.length;
+ $('oddEven').textContent=Math.round(odds)+'/'+(6-Math.round(odds));
+ $('period').textContent='Amostra: concursos '+Math.min(...draws.map(d=>d.concurso))+' a '+Math.max(...draws.map(d=>d.concurso))+'. Frequência calculada apenas sobre os resultados exibidos.';
+ $('frequency').innerHTML=sorted.slice(0,10).map(n=>'<div class="barrow"><b>'+fmt(n)+'</b><div class="bar"><i style="width:'+(f[n]/draws.length*100)+'%"></i></div><span class="small">'+f[n]+'</span></div>').join('');
+}
+function pickWeighted(pool,weights){let total=pool.reduce((s,n)=>s+weights[n],0),r=Math.random()*total;for(const n of pool){r-=weights[n];if(r<=0)return n}return pool[pool.length-1]}
+function makeGame(f){
+ let pool=Array.from({length:60},(_,i)=>i+1),weights=Array(61).fill(1);
+ // Frequência recente influencia suavemente o peso; nunca exclui dezenas.
+ for(let n=1;n<=60;n++)weights[n]=1+f[n]*.45;
+ let chosen=[];
+ while(chosen.length<6){let n=pickWeighted(pool,weights);chosen.push(n);pool=pool.filter(x=>x!==n)}
+ chosen.sort((a,b)=>a-b);
+ // Tenta manter paridade e distribuição razoáveis sem impor previsão.
+ let odd=chosen.filter(n=>n%2).length;
+ if(odd<2||odd>4)return makeGameRetry(f);
+ return chosen;
+}
+function makeGameRetry(f){for(let i=0;i<80;i++){let pool=Array.from({length:60},(_,i)=>i+1),w=Array(61).fill(1);for(let n=1;n<=60;n++)w[n]=1+f[n]*.45;let a=[];while(a.length<6){let n=pickWeighted(pool,w);a.push(n);pool=pool.filter(x=>x!==n)}a.sort((x,y)=>x-y);let o=a.filter(n=>n%2).length;let bands=new Set(a.map(n=>Math.floor((n-1)/10))).size;if(o>=2&&o<=4&&bands>=3)return a}return Array.from({length:6},(_,i)=>i+1)}
+function generate(){if(!draws.length){$('games').innerHTML='<p class="muted">Sem resultados carregados. Tente atualizar primeiro.</p>';return}let f=freq(),count=Number($('qty').value),seen=new Set();generated=[];let tries=0;while(generated.length<count&&tries++<count*100){let g=makeGame(f),key=g.join('-');if(!seen.has(key)){seen.add(key);generated.push(g)}}$('games').innerHTML=generated.map((g,i)=>'<div class="game"><div class="gamehead"><b>Jogo '+(i+1)+'</b><span class="pill">6 dezenas</span></div><div class="balls">'+g.map(n=>'<span class="ball">'+fmt(n)+'</span>').join('')+'</div></div>').join('')}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;draws=[];generated=[];$('games').innerHTML='<p class="muted">Carregando jogos e estatísticas…</p>';load()}));
+$('refresh').onclick=load;$('generate').onclick=generate;
+$('copy').onclick=async()=>{if(!generated.length)return;let t=generated.map((g,i)=>'Jogo '+(i+1)+': '+g.map(fmt).join(' - ')).join('\n');try{await navigator.clipboard.writeText(t);$('copy').textContent='Copiado!';setTimeout(()=>$('copy').textContent='Copiar jogos',1800)}catch(e){$('copy').textContent='Não foi possível copiar'}};
+load();
+</script></body></html>
